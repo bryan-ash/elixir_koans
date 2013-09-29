@@ -1,0 +1,2 @@
+defmodule ElixirKoans do
+end
