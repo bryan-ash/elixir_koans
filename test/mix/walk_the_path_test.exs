@@ -8,8 +8,6 @@ defmodule Walk_the_path do
 
   test "Shows damaged karma for 'test the truth'" do
     output = System.cmd "mix walk_the_path"
-    assert output =~ %r/AboutAsserts 'test the truth' has damaged your karma./
-    assert output =~ %r/Please meditate on the following code:\n/
-    assert output =~ %r/koans\/about_asserts.exs:7, in 'test the truth'/
+    assert output =~ %r/AboutAsserts 'test assert truth' has damaged your karma./
   end
 end

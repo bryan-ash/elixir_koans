@@ -1,4 +1,4 @@
-defmodule ExUnit.KoanFormatter do
+defmodule KoanFormatter do
   @behaviour ExUnit.Formatter
 
   def suite_started(_opts) do
@@ -22,15 +22,21 @@ defmodule ExUnit.KoanFormatter do
   end
 
   def test_finished(:ok, test) do
-		ExUnit.Test[name: name, case: test_case, failure: failure] = test
-		{_error, _expectation_error, [{_, _, _, [file: file, line: line]}]} = failure
+		ExUnit.Test[name: description, case: test_case, failure: failure] = test
+		{_kind, _reason, [{_, _, _, [file: file, line: line]}]} = failure
 		# test_name = String.split(name, %r/^test /)
 
-		message = 
-			"#{test_case} '#{name}' has damaged your karma.\n\n" <>
-			"Please meditate on the following code:\n" <>
-			"  #{file}:#{line}, in '#{name}'"
-		IO.puts message
+		IO.puts formatted_test_failure(test_case, description, Path.relative_to_cwd(file), line)
 		:ok
   end
+
+  def formatted_test_failure(test_case, description, file, line) do
+		red("#{inspect(test_case)} '#{description}' has damaged your karma.\n\n") <>
+			"Please meditate on the following code:\n" <>
+			red("  ./#{file}:#{line}, in '#{description}'")
+	end
+
+	defp red(string) do
+		IO.ANSI.escape("%{red}" <> string)
+	end
 end
