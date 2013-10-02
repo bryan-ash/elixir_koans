@@ -22,12 +22,12 @@ defmodule KoanFormatter do
   end
 
   def test_finished(:ok, test) do
-		ExUnit.Test[name: description, case: test_case, failure: failure] = test
-		{_kind, _reason, [{_, _, _, [file: file, line: line]}]} = failure
-		# test_name = String.split(name, %r/^test /)
+    ExUnit.Test[name: description, case: test_case, failure: failure] = test
+    {_kind, _reason, [{_, _, _, [file: file, line: line]}]} = failure
+    # test_name = String.split(name, %r/^test /)
 
-		IO.puts formatted_test_failure(test_case, description, Path.relative_to_cwd(file), line)
-		:ok
+    IO.puts formatted_test_failure(test_case, description, Path.relative_to_cwd(file), line)
+    System.halt(0)
   end
 
   def formatted_test_failure(test_case, description, file, line) do
