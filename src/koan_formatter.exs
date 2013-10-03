@@ -21,8 +21,11 @@ defmodule KoanFormatter do
     :ok
   end
 
-  def test_finished(:ok, ExUnit.Test[name: description, case: test_case, failure: ({:error, _, _} = failure)]) do
-    {_kind, _reason, [{_, _, _, [file: file, line: line]}]} = failure
+  def test_finished(:ok, 
+                    ExUnit.Test[name: description, 
+                                case: test_case, 
+                                failure: ({:error, _reason, 
+                                           [{_, _, _, [file: file, line: line]}]})]) do
     # test_name = String.split(name, %r/^test /)
 
     IO.puts formatted_test_failure(test_case, description, Path.relative_to_cwd(file), line)
