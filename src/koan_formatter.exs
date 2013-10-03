@@ -35,20 +35,20 @@ defmodule KoanFormatter do
   end
 
   def formatted_test_failure(test_case, description, file, line) do
-		red("#{inspect(test_case)} '#{description}' has damaged your karma.\n\n") <>
-			"Please meditate on the following code:\n" <>
-			red("  ./#{file}:#{line}, in '#{description}'")
-	end
+    red("#{inspect(test_case)} '#{description}' has damaged your karma.\n\n") <>
+      "Please meditate on the following code:\n" <>
+      red("  ./#{file}:#{line}, in '#{description}'")
+  end
 
   def formatted_test_success(test_case, description) do
-		green("#{inspect(test_case)} '#{description}' has expanded your awareness.")
-	end
+    green("#{inspect(test_case)} '#{description}' has expanded your awareness.")
+  end
 
-	defp red(string) do
-		IO.ANSI.escape("%{red}" <> string)
-	end
+  defp red(string) do
+    IO.ANSI.escape("%{red}" <> string)
+  end
 
-	defp green(string) do
-		IO.ANSI.escape("%{green}" <> string)
-	end
+  defp green(string) do
+    IO.ANSI.escape("%{green}" <> string)
+  end
 end
