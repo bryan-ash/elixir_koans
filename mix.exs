@@ -40,7 +40,7 @@ defmodule Mix.Tasks.Walk_the_path do
  
   def run(_) do
     Mix.Task.run "gen"
-    Code.require_file "path_to_enlightenment.exs", "koans"
+    Code.require_file "path_to_enlightenment.exs", "lib"
   end
 end
  

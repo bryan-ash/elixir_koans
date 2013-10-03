@@ -1,4 +1,4 @@
-Code.require_file "../src/koan_formatter.exs", __DIR__
+Code.require_file "koan_formatter.exs", "lib"
 
 defmodule KoanFormatterTest do
   use ExUnit.Case
