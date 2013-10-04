@@ -141,10 +141,16 @@ to Jim Weirich and all who contributed to that project.
 
 <table>
   <tr>
-    <td>The Elixir Language</td>
     <td>
-      <a href="http://elixir-lang.org">http://elixir-lang.org</a>
+      <a href="http://elixir-lang.org">The Elixir Language</a>
     </td>
+    <td>The home of Elixir, providing installation instructions, a language introduction, and links.</td>
+  </tr>
+  <tr>
+    <td>
+      <a href="http://tryelixir.org/">Try Elixir</a>
+    </td>
+    <td>An interactive language walkthrough.</td>
   </tr>
 </table>
 
