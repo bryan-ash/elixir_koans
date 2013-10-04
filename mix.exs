@@ -14,7 +14,7 @@ defmodule Mix.Tasks.Gen do
   @shortdoc "Prepare by generating the koans"
 
   def run(_) do
-    unless File.exists? "koans/path_to_enlightenment.exs" do
+    unless File.exists? "koans/" do
       IO.puts "Creating a fresh set of koans"
       File.mkdir "koans"
       File.cp_r "src/.", "koans"
