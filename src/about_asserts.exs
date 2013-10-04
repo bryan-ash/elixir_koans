@@ -11,4 +11,9 @@ defmodule AboutAsserts do
   test "assert with message" do
     assert false, "This should be true -- Please fix this"
   end
+
+  # Sometimes we expect a negative outcome
+  test "refute a negative assertion" do
+    refute true, "This should be false -- Please fix this"
+  end
 end
