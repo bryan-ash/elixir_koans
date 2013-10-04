@@ -4,7 +4,7 @@ defmodule Mix.Tasks.Clobber_koans do
   @shortdoc "Remove the koans directory"
 
   def run(_) do
-    File.rm_rf "koans/."
+    File.rm_rf "koans/"
   end
 end
 
