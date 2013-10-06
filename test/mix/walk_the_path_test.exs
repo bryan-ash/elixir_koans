@@ -4,7 +4,7 @@ defmodule Walk_the_path do
   test "Shows damaged karma only for the first test" do
     System.cmd "mix regen"
     output = System.cmd "mix walk_the_path"
-    assert output =~ %r/AboutAsserts 'test assert truth' has damaged your karma./
+    assert output =~ %r/AboutAsserts test 'assert truth' has damaged your karma./
     refute output =~ %r/test assert with message/
   end
 end

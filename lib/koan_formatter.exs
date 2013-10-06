@@ -12,9 +12,7 @@ defmodule KoanFormatter do
                                 case: test_case,
                                 failure: ({:error, _reason,
                                            [{_, _, _, [file: file, line: line]}]})]) do
-    # test_name = String.split(name, %r/^test /)
-
-    IO.puts formatted_test_failure(test_case, description, Path.relative_to_cwd(file), line)
+    IO.puts formatted_test_failure(test_case, test_name, Path.relative_to_cwd(file), line)
     System.halt(0)
   end
 
@@ -23,14 +21,19 @@ defmodule KoanFormatter do
     :ok
   end
 
-  def formatted_test_failure(test_case, description, file, line) do
-    red("#{inspect(test_case)} '#{description}' has damaged your karma.\n\n") <>
+  def formatted_test_failure(test_case, test_name, file, line) do
+    red("#{inspect(test_case)} test '#{description(test_name)}' has damaged your karma.\n\n") <>
       "Please meditate on the following code:\n" <>
-      red("  ./#{file}:#{line}, in '#{description}'")
+      red("  ./#{file}:#{line}, in test '#{description(test_name)}'")
   end
 
-  def formatted_test_success(test_case, description) do
-    green("#{inspect(test_case)} '#{description}' has expanded your awareness.")
+  def formatted_test_success(test_case, test_name) do
+    green("#{inspect(test_case)} test '#{description(test_name)}' has expanded your awareness.")
+  end
+
+  defp description(test_name) do
+    "test " <> description = to_string(test_name)
+    description
   end
 
   defp red(string) do
