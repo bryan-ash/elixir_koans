@@ -1,30 +1,16 @@
 defmodule KoanFormatter do
   @behaviour ExUnit.Formatter
 
-  def suite_started(_opts) do
-    :ok
-  end
+  def suite_started(_opts), do: :ok
+  def suite_finished(:ok, _run_us, _load_us), do: 1
+  def case_started(:ok, _test_case), do: :ok
+  def case_finished(:ok, _test_case), do: :ok
+  def test_started(:ok, _test), do: :ok
 
-  def suite_finished(:ok, _run_us, _load_us) do
-    1
-  end
-
-  def case_started(:ok, _test_case) do
-    :ok
-  end
-
-  def case_finished(:ok, _test_case) do
-    :ok
-  end
-
-  def test_started(:ok, _test) do
-    :ok
-  end
-
-  def test_finished(:ok, 
-                    ExUnit.Test[name: description, 
-                                case: test_case, 
-                                failure: ({:error, _reason, 
+  def test_finished(:ok,
+                    ExUnit.Test[name: test_name,
+                                case: test_case,
+                                failure: ({:error, _reason,
                                            [{_, _, _, [file: file, line: line]}]})]) do
     # test_name = String.split(name, %r/^test /)
 
