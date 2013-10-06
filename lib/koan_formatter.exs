@@ -10,25 +10,30 @@ defmodule KoanFormatter do
   def test_finished(:ok,
                     ExUnit.Test[name: test_name,
                                 case: test_case,
-                                failure: ({:error, _reason,
+                                failure: ({:error,
+                                           ExUnit.ExpectationError[expected: expected,
+                                                                   assertion: assertion,
+                                                                   prelude: prelude,
+                                                                   expr: expr],
                                            [{_, _, _, [file: file, line: line]}]})]) do
-    IO.puts formatted_test_failure(test_case, test_name, Path.relative_to_cwd(file), line)
+    IO.puts formatted_test_failure(test_case, test_name, prelude, expr, assertion, expected, Path.relative_to_cwd(file), line)
     System.halt(0)
   end
 
-  def test_finished(:ok, ExUnit.Test[name: description, case: test_case]) do
-    IO.puts formatted_test_success(test_case, description)
+  def test_finished(:ok, ExUnit.Test[name: test_name, case: test_case]) do
+    IO.puts formatted_test_success(test_case, test_name)
     :ok
   end
 
-  def formatted_test_failure(test_case, test_name, file, line) do
-    red("#{inspect(test_case)} test '#{description(test_name)}' has damaged your karma.\n\n") <>
+  def formatted_test_failure(test_case, test_name, prelude, expr, assertion, expected, file, line) do
+    "#{inspect(test_case)} test '#{description(test_name)}' has damaged your karma.\n" <>
+      color("red", "  #{prelude} \"#{expr}\" to #{assertion} #{expected}.\n\n") <>
       "Please meditate on the following code:\n" <>
-      red("  ./#{file}:#{line}, in test '#{description(test_name)}'")
+      color("cyan", "  ./#{file}:#{line}, in test '#{description(test_name)}'")
   end
 
   def formatted_test_success(test_case, test_name) do
-    green("#{inspect(test_case)} test '#{description(test_name)}' has expanded your awareness.")
+    color("green", "#{inspect(test_case)} test '#{description(test_name)}' has expanded your awareness.")
   end
 
   defp description(test_name) do
@@ -36,11 +41,7 @@ defmodule KoanFormatter do
     description
   end
 
-  defp red(string) do
-    IO.ANSI.escape("%{red}" <> string)
-  end
-
-  defp green(string) do
-    IO.ANSI.escape("%{green}" <> string)
+  defp color(color, string) do
+    IO.ANSI.escape("%{" <> color <> "}" <> string)
   end
 end
