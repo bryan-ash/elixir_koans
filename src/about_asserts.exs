@@ -1,3 +1,5 @@
+Code.require_file "test_helper.exs", __DIR__
+
 defmodule AboutAsserts do
   use ExUnit.Case
 
