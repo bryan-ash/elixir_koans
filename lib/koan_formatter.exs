@@ -8,14 +8,12 @@ defmodule KoanFormatter do
   def test_started(:ok, _test), do: :ok
 
   def test_finished(:ok,
-                    ExUnit.Test[name: test_name,
-                                case: test_case,
-                                failure: ({:error,
+                    ExUnit.Test[failure: ({:error,
                                            ExUnit.ExpectationError[expected: expected,
                                                                    assertion: assertion,
                                                                    prelude: prelude,
                                                                    expr: expr],
-                                           [{_, _, _, [file: file, line: line]}]})]) do
+                                           [{test_case, test_name, _, [file: file, line: line]}]})]) do
     IO.puts formatted_test_failure(test_case, test_name, prelude, expr, assertion, expected, Path.relative_to_cwd(file), line)
     System.halt(0)
   end
