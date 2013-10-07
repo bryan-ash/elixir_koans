@@ -10,7 +10,7 @@ live.  Testing is essential in your quest to learn and do great things in Elixir
 
 The koans are broken out into areas by file, lists are covered in `about_lists.exs`,
 modules are introduced in `about_modules.exs`, *etc*.  They are presented in
-order in the `path_to_enlightenment.ex` file.
+order in the `elixir_koans.ex` file.
 
 Each koan builds up your knowledge of Elixir and builds upon itself. It will stop at
 the first place you need to correct.
