@@ -9,12 +9,11 @@ defmodule KoanFormatter do
 
   def test_finished(:ok,
                     ExUnit.Test[failure: ({:error,
-                                           ExUnit.ExpectationError[expected: expected,
-                                                                   assertion: assertion,
-                                                                   prelude: prelude,
-                                                                   expr: expr],
+                                           ExUnit.ExpectationError[] = record,
                                            [{test_case, test_name, _, [file: file, line: line]}]})]) do
-    IO.puts formatted_test_failure(test_case, test_name, prelude, expr, assertion, expected, Path.relative_to_cwd(file), line)
+    IO.puts formatted_test_failure(test_case, test_name,
+                                   record.prelude, record.expected, record.actual, record.assertion,
+                                   Path.relative_to_cwd(file), line)
     System.halt(0)
   end
 
@@ -23,9 +22,9 @@ defmodule KoanFormatter do
     :ok
   end
 
-  def formatted_test_failure(test_case, test_name, prelude, expr, assertion, expected, file, line) do
+  def formatted_test_failure(test_case, test_name, prelude, expected, actual, assertion, file, line) do
     "#{inspect(test_case)} test '#{description(test_name)}' has damaged your karma.\n" <>
-      color("red", "  #{prelude} \"#{expr}\" to #{assertion} #{expected}.\n\n") <>
+      color("red", "  #{prelude} #{actual} to #{assertion} #{expected}.\n\n") <>
       "Please meditate on the following code:\n" <>
       color("cyan", "  ./#{file}:#{line}, in test '#{description(test_name)}'")
   end
