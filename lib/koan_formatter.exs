@@ -48,18 +48,6 @@ defmodule KoanFormatter do
     super(reqest, from, state)
   end
 
-  def handle_cast({ :test_started, ExUnit.Test[] = _test }, state) do
-    { :noreply, state }
-  end
-
-  def handle_cast({ :case_started }, state) do
-    { :noreply, state }
-  end
-
-  def handle_cast({ :case_finished }, state) do
-    { :noreply, state }
-  end
-
   def handle_cast({ :test_finished, ExUnit.Test[failure: nil] = test }, state = State[]) do
     IO.puts formatted_test_success(test.case, test.name)
     { :noreply, state.update_successes(&(&1 + 1)) }
