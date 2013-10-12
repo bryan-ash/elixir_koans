@@ -40,6 +40,7 @@ defmodule KoanFormatter do
   end
 
   def handle_call({ :suite_finished, _run_us, _load_us }, _from, state = State[]) do
+    IO.puts "\n" <> progress_along_the_path(state)
     { :stop, :normal, state.failures, state }
   end
 
@@ -69,13 +70,10 @@ defmodule KoanFormatter do
                                            ExUnit.ExpectationError[] = record,
                                                   [{test_case, test_name, _, [file: file, line: line]}]})] },
                   state = State[]) do
-    state = state.update_failures(&(&1 + 1))
     IO.puts formatted_test_failure(test_case, test_name,
                                    record.prelude, record.expected, record.actual, record.assertion,
-                                   Path.relative_to_cwd(file), line) <>
-         "\n\n" <>
-         progress_along_the_path(state.successes, state.failures)
-    System.halt(0)
+                                   Path.relative_to_cwd(file), line)
+    { :noreply, state.update_failures(&(&1 + 1)) }
   end
 
   def handle_cast(request, state) do
@@ -93,15 +91,18 @@ defmodule KoanFormatter do
     color("green", "#{inspect(test_case)} test '#{description(test_name)}' has expanded your awareness.")
   end
 
-  def progress_along_the_path(successes, failures) do
+  def progress_along_the_path(state = State[]) do
     color("green", "your progess so far [") <>
-      progress(successes, failures) <>
+      progress(state) <>
       color("green", "]")
   end
 
-  def progress(0 = _successes, 0 = _failures), do: ""
-  def progress(0 = _successes, _failures), do: color("red", "X")
-  def progress(successes, failures) when successes > 0, do: color("green", ".") <> progress(successes - 1, failures)
+  def progress(State[successes: 0, failures: 0]), do: ""
+  def progress(State[successes: 0]), do: color("red", "X")
+
+  def progress(State[successes: successes] = state) when successes > 0 do
+    color("green", ".") <> progress(state.update_successes(&(&1 - 1)))
+  end
 
   defp description(test_name) do
     "test " <> description = to_string(test_name)
