@@ -4,7 +4,7 @@ defmodule KoanFormatter do
 
   use GenServer.Behaviour
 
-  defrecord State, successes: 0, failures: 0
+  defrecord State, successes: 0, failures: 0, remaining: 0, running: true
 
   ## Behaviour
 
@@ -73,7 +73,7 @@ defmodule KoanFormatter do
     IO.puts formatted_test_failure(test_case, test_name,
                                    record.prelude, record.expected, record.actual, record.assertion,
                                    Path.relative_to_cwd(file), line)
-    { :noreply, state.update_failures(&(&1 + 1)) }
+    { :noreply, state.update_failures(&(&1 + 1)).update_running(fn(_) -> false end) }
   end
 
   def handle_cast(request, state) do
@@ -97,12 +97,18 @@ defmodule KoanFormatter do
       color("green", "]")
   end
 
-  def progress(State[successes: 0, failures: 0]), do: ""
-  def progress(State[successes: 0]), do: color("red", "X")
+  def progress(State[successes: 0, failures: 0, remaining: 0]), do: ""
+
+  def progress(State[successes: 0, failures: failures] = state) when failures > 0 do
+    color("red", "X") <> path_remaining(state.remaining)
+  end
 
   def progress(State[successes: successes] = state) when successes > 0 do
     color("green", ".") <> progress(state.update_successes(&(&1 - 1)))
   end
+
+  def path_remaining(0), do: ""
+  def path_remaining(remaining), do: color("cyan", "_") <> path_remaining(remaining - 1)
 
   defp description(test_name) do
     "test " <> description = to_string(test_name)

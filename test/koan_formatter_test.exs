@@ -34,8 +34,12 @@ defmodule KoanFormatterTest do
     assert progress(KoanFormatter.State.new(successes: 1, failures: 0)) == IO.ANSI.green <> "." <> IO.ANSI.reset
   end
 
-  test "progress shows '.' for each success, and 'X' for failure" do
-    assert ansi_unescape(progress(KoanFormatter.State.new(successes: 3, failures: 1))) == "...X"
+  test "progress shows '_' for a remaining koan" do
+    assert path_remaining(1) == IO.ANSI.cyan <> "_" <> IO.ANSI.reset
+  end
+
+  test "progress shows '.' for each success, 'X' for failure, and '_' for each remaining" do
+    assert ansi_unescape(progress(KoanFormatter.State.new(successes: 3, failures: 1, remaining: 2))) == "...X__"
   end
 
   defp ansi_unescape(string), do: Regex.replace(%r/\e\[\d+m/, string, "")
