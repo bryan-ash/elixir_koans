@@ -1,3 +1,4 @@
+Code.require_file "test_helper.exs", __DIR__
 Code.require_file "koan_formatter.exs", "lib"
 
 defmodule KoanFormatterTest do
@@ -22,4 +23,18 @@ defmodule KoanFormatterTest do
 
     assert output =~ %r/AboutAsserts test 'assert truth' has expanded your awareness./
   end
+
+  test "progress shows 'X' when the first koan is failed" do
+    assert KoanFormatter.progress(0, 1) == IO.ANSI.red <> "X" <> IO.ANSI.reset
+  end
+
+  test "progress is '.' when the first koan is passed" do
+    assert KoanFormatter.progress(1, 0) == IO.ANSI.green <> "." <> IO.ANSI.reset
+  end
+
+  test "progress shows '.' for each success, and 'X' for failure" do
+    assert ansi_unescape(KoanFormatter.progress(3, 1)) == "...X"
+  end
+
+  defp ansi_unescape(string), do: Regex.replace(%r/\e\[\d+m/, string, "")
 end

@@ -6,5 +6,6 @@ defmodule Walk_the_path do
     output = System.cmd "mix walk_the_path"
     assert output =~ %r/AboutAsserts test 'assert truth' has damaged your karma./
     refute output =~ %r/test assert with message/
+    assert output =~ %r/\[X_*\]/
   end
 end

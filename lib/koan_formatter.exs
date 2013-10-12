@@ -1,4 +1,5 @@
 defmodule KoanFormatter do
+  @timeout 30_000
   @behaviour ExUnit.Formatter
 
   use GenServer.Behaviour
@@ -50,28 +51,31 @@ defmodule KoanFormatter do
     { :noreply, state }
   end
 
+  def handle_cast({ :case_started }, state) do
+    { :noreply, state }
+  end
+
+  def handle_cast({ :case_finished }, state) do
+    { :noreply, state }
+  end
+
+  def handle_cast({ :test_finished, ExUnit.Test[failure: nil] = test }, state = State[]) do
+    IO.puts formatted_test_success(test.case, test.name)
+    { :noreply, state.update_successes(&(&1 + 1)) }
+  end
+
   def handle_cast({ :test_finished,
                     ExUnit.Test[failure: ({:error,
                                            ExUnit.ExpectationError[] = record,
                                                   [{test_case, test_name, _, [file: file, line: line]}]})] },
-                  _state = State[]) do
+                  state = State[]) do
+    state = state.update_failures(&(&1 + 1))
     IO.puts formatted_test_failure(test_case, test_name,
                                    record.prelude, record.expected, record.actual, record.assertion,
-                                   Path.relative_to_cwd(file), line)
+                                   Path.relative_to_cwd(file), line) <>
+         "\n\n" <>
+         progress_along_the_path(state.successes, state.failures)
     System.halt(0)
-  end
-
-  def handle_cast({ :test_finished, ExUnit.Test[name: test_name, case: test_case] }, _state = State[]) do
-    IO.puts formatted_test_success(test_case, test_name)
-    :ok
-  end
-
-  def handle_cast({ :case_started, ExUnit.TestCase[name: _name] }, state) do
-    { :noreply, state }
-  end
-
-  def handle_cast({ :case_finished, _test_case }, state) do
-    { :noreply, state }
   end
 
   def handle_cast(request, state) do
@@ -88,6 +92,16 @@ defmodule KoanFormatter do
   def formatted_test_success(test_case, test_name) do
     color("green", "#{inspect(test_case)} test '#{description(test_name)}' has expanded your awareness.")
   end
+
+  def progress_along_the_path(successes, failures) do
+    color("green", "your progess so far [") <>
+      progress(successes, failures) <>
+      color("green", "]")
+  end
+
+  def progress(0 = _successes, 0 = _failures), do: ""
+  def progress(0 = _successes, _failures), do: color("red", "X")
+  def progress(successes, failures) when successes > 0, do: color("green", ".") <> progress(successes - 1, failures)
 
   defp description(test_name) do
     "test " <> description = to_string(test_name)
