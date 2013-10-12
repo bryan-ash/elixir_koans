@@ -48,7 +48,8 @@ defmodule KoanFormatter do
     super(reqest, from, state)
   end
 
-  def handle_cast({ :test_finished, ExUnit.Test[failure: nil] = test }, state = State[]) do
+  def handle_cast({ :test_finished, ExUnit.Test[failure: nil] = test },
+                  state = State[running: true]) do
     IO.puts formatted_test_success(test.case, test.name)
     { :noreply, state.update_successes(&(&1 + 1)) }
   end
@@ -57,11 +58,15 @@ defmodule KoanFormatter do
                     ExUnit.Test[failure: ({:error,
                                            ExUnit.ExpectationError[] = record,
                                                   [{test_case, test_name, _, [file: file, line: line]}]})] },
-                  state = State[]) do
+                  state = State[running: true]) do
     IO.puts formatted_test_failure(test_case, test_name,
                                    record.prelude, record.expected, record.actual, record.assertion,
                                    Path.relative_to_cwd(file), line)
     { :noreply, state.update_failures(&(&1 + 1)).update_running(fn(_) -> false end) }
+  end
+
+  def handle_cast({ :test_finished, _test }, state = State[running: false]) do
+    { :noreply, state.update_remaining(&(&1 + 1)) }
   end
 
   def handle_cast(request, state) do
