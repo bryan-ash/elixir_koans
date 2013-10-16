@@ -48,20 +48,16 @@ defmodule KoanFormatter do
     super(reqest, from, state)
   end
 
-  def handle_cast({ :test_finished, ExUnit.Test[failure: nil] = test },
-                  state = State[running: true]) do
+  def handle_cast({ :test_finished, ExUnit.Test[failure: nil] = test }, state = State[running: true]) do
     IO.puts formatted_test_success(test.case, test.name)
     { :noreply, state.update_successes(&(&1 + 1)) }
   end
 
-  def handle_cast({ :test_finished,
-                    ExUnit.Test[failure: ({:error,
-                                           ExUnit.ExpectationError[] = record,
-                                                  [{test_case, test_name, _, [file: file, line: line]}]})] },
-                  state = State[running: true]) do
-    IO.puts formatted_test_failure(test_case, test_name,
-                                   record.prelude, record.expected, record.actual, record.assertion,
-                                   Path.relative_to_cwd(file), line)
+  def handle_cast({ :test_finished, test }, state = State[running: true]) do
+    ExUnit.Test[failure: {:error, expectation, location}] = test
+    [{_, _, _, [file: file, line: line]}] = location
+
+    IO.puts formatted_test_failure(test, expectation, file, line)
     { :noreply, state.update_failures(&(&1 + 1)).update_running(fn(_) -> false end) }
   end
 
@@ -73,11 +69,26 @@ defmodule KoanFormatter do
     super(request, state)
   end
 
-  def formatted_test_failure(test_case, test_name, prelude, expected, actual, assertion, file, line) do
-    "#{inspect(test_case)} test '#{description(test_name)}' has damaged your karma.\n" <>
-      color("red", "  #{prelude} #{actual} to #{assertion} #{expected}.\n\n") <>
-      "Please meditate on the following code:\n" <>
-      color("cyan", "  ./#{file}:#{line}, in test '#{description(test_name)}'")
+  def formatted_test_failure(test, expectation, file, line) do
+    statement_of_damaged_karma(test) <>
+      formatted_expectation(expectation) <>
+      guided_direction(file, line, test)
+  end
+
+  def statement_of_damaged_karma(test) do
+    "#{inspect(test.case)} test '#{description(test.name)}' has damaged your karma.\n"
+  end
+
+  def formatted_expectation(ExUnit.ExpectationError[prelude: prelude,
+                                                    actual: actual,
+                                                    assertion: assertion,
+                                                    expected: expected]) do
+    color("red", "  #{prelude} #{actual} to #{assertion} #{expected}.\n\n")
+  end
+
+  def guided_direction(file, line, test) do
+    "Please meditate on the following code:\n" <>
+      color("cyan", "  #{Path.relative_to_cwd(file)}:#{line}, in test '#{description(test.name)}'")
   end
 
   def formatted_test_success(test_case, test_name) do

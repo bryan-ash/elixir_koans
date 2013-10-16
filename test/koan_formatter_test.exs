@@ -7,11 +7,11 @@ defmodule KoanFormatterTest do
   import KoanFormatter
 
   test "a failure guides the student to the error" do
-    output = formatted_test_failure(TestCase, :"test something",
-                                    "Believed",
-                                    "magical",
-                                    "\"unicorns\"",
-                                    "seem",
+    output = formatted_test_failure(ExUnit.Test[case: TestCase, name: :"test something"],
+                                    ExUnit.ExpectationError[prelude: "Believed",
+                                                            expected: "magical",
+                                                            actual: "\"unicorns\"",
+                                                            assertion: "seem"],
                                     "./koans/about_unicorns.exs", 8)
 
     assert output =~ %r/TestCase test 'something' has damaged your karma./
